@@ -3,22 +3,23 @@
 void vector::checkInstance() {
 	//Przy większej ilości instancji (COW)
 	if (*_instances > 1) {
-		//Zrób kopię głęboką danych
+		//Kopia głęboka danych
 		double *temp = new double[_capacity];
 		std::copy_n(_data, _size, temp);
 
-		//Przepięcie nowyej tablicy
+		//Przepięcie na nową tablicę
 		_data = temp;
 
 		//Odpięcie instancji z licznika
 		(*_instances)--;
 
-		//Utworzenie nowego licznika dla instancji
+		//Utworzenie nowego licznika instancji
 		_instances = new size_t(1);
 	}
 }
 
 bool vector::checkIndex(double pos) {
+	//Zwracanie czy pozycja mieście się w zakresie danych
 	return (pos < 0 || pos >= _size);
 }
 
@@ -83,7 +84,7 @@ bool vector::operator==(const vector &other) {
 	//Jeżeli są z tej samej instancji to są równe
 	if (_instances == other._instances) return true;
 	
-	//Sprawdzanie posczególnych elementów
+	//Sprawdzanie poszczególnych elementów
 	for (size_t i = 0; i < _size; i++)
 		if (_data[i] != other._data[i]) return false;
 	
@@ -116,7 +117,7 @@ double vector::at(double pos) {
 }
 
 void vector::clear() {
-	//Ustaw ilość zajętych elementów na 0
+	//Ustawienie ilości zajętych elementów na 0
 	_size = 0;
 }
 
@@ -164,7 +165,7 @@ double vector::pop_back() {
 		std::cout << "Err: Cant pop from empty vector!\n";
 	}
 
-	//Wyrzucanie ostatniej wartości z tablice
+	//Wyrzucanie ostatniej wartości z tablicy
 	return _data[_size--];
 }
 
@@ -174,24 +175,24 @@ void vector::push_back(double value) {
 
 	//Gdy w tablicy nie ma miejsca...
 	if (_size + 1 > _capacity) {
-		//Zadeklaruj nową dwa razy większą
+		//Deklaracja nowej dwa razy większej
 		_capacity *= 2;
 		double *newData = new double[_capacity];
 
-		//Przepisz dane
+		//Kopia danych
 		std::copy_n(_data, _size, newData);
 
-		//Usuń starą tablicę i zacznij używać nowej
+		//Usunięcie starej tablicy i przepięcie na nową
 		delete[] _data;
 		_data = newData;
 	}
 
-	//Wpisz element
+	//Wpisanie elementu
 	_data[_size++] = value;
 }
 
 void vector::reverse() {
-	//Jeżeli tablica nie jest pusta
+	//Jeżeli tablica nie jest pusta...
 	if (!empty()) {
 		//Copy-On-Write
 		checkInstance();
@@ -202,10 +203,13 @@ void vector::reverse() {
 }
 
 void vector::sort(bool reverse) {
-	//Copy-On-Write
-	checkInstance();
+	//Jeżeli tablica nie jest pusta...
+	if (!empty()) {
+		//Copy-On-Write
+		checkInstance();
 
-	//Sortowanie (optymalizowane przez kompilator)
-	if (reverse == false) std::sort(begin(), end());
-	else std::sort(begin(), end(), std::greater<>());
+		//Sortowanie (optymalizowane przez kompilator)
+		if (reverse == false) std::sort(begin(), end());
+		else std::sort(begin(), end(), std::greater<>());
+	}
 }
