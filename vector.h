@@ -5,13 +5,13 @@
 
 // Implementacja klasy std::vector
 // Autor: Michał Kucharski (M. Kucharskov)
-// Wersja: 1.0 (z dnia 1.05.2018)
+// Wersja: 2.0 (z dnia 1.05.2018)
 // Wektor posiada inerpolację danych (odczyt wartości pośrednich)
 // oraz paradygmat Copy-On-Write optymalizujący zużycie pamięci
 
 class vector {
 private:
-	double *_data = nullptr;
+	double * _data = nullptr;
 	size_t _capacity = 0;
 	size_t _size = 0;
 
@@ -35,24 +35,28 @@ public:
 	//Operatory
 	vector &operator=(const vector &);
 	bool operator==(const vector &);
-	double operator[](double);
+	double & operator[](size_t);
 
 	//Metody const
 	size_t size() const { return _size; };
 	size_t capacity() const { return _capacity; };
 	size_t instances() const { return *_instances; };
+	bool empty() const { return _size == 0; };
 
 	//Metody
-	double at(double);
+	double & at(size_t);
 	void clear();
-	bool empty();
 	void insert(size_t, double);
-	double max();
-	double min();
 	double pop_back();
 	void push_back(double);
+	void reserve(size_t);
 	void reverse();
 	void sort(bool = false);
+
+	//Metody stricte matematyczne
+	double interpolate(double);
+	double max();
+	double min();
 
 	//Iteratory dla range-based for (CPP 11)
 	double * begin() { return &_data[0]; };

@@ -20,22 +20,20 @@ void vector::checkInstance() {
 
 bool vector::checkIndex(double pos) {
 	//Zwracanie czy pozycja mieście się w zakresie danych
-	return (pos < 0 || pos >= _size);
+	return (pos < 0 || std::ceil(pos) >= _size);
 }
 
 vector::vector(size_t c) :
 	_capacity(c),
 	_size(0) {
-	if (c == 0) {
-		//TODO: Rzucanie wyjątku
-		std::cout << "Err: Vector size can't be 0!\n";
-	}
-
-	//Deklaracja tablicy
-	_data = new double[_capacity];
-
+	//Rzucanie wyjątku
+	if (c == 0)	throw std::length_error("Err: Vector size can't be 0!");
+	
 	//Licznik instancji (COW)
 	_instances = new size_t(1);
+
+	//Zarezerwowanie miejsca w pamięci
+	reserve(_capacity);
 }
 
 vector::vector(vector &copy) {
@@ -77,12 +75,12 @@ vector & vector::operator=(const vector &copy) {
 bool vector::operator==(const vector &other) {
 	//Muszą mieć tą samą ilość elementów
 	if (_size != other._size) return false;
+			
+	//Jeżeli są z tej samej instancji to są równe
+	if (_instances == other._instances) return true;
 
 	//Muszą mieć tą samą pojemność
 	if (_capacity != other._capacity) return false;
-		
-	//Jeżeli są z tej samej instancji to są równe
-	if (_instances == other._instances) return true;
 	
 	//Sprawdzanie poszczególnych elementów
 	for (size_t i = 0; i < _size; i++)
@@ -92,28 +90,17 @@ bool vector::operator==(const vector &other) {
 	return true;
 }
 
-double vector::operator[](double pos) {
-	//Zwracanie wartości (zabezpieczenie w metodzie at)
+double & vector::operator[](size_t pos) {
+	//Zwracanie działania metody at()
 	return at(pos);
 }
 
-double vector::at(double pos) {
-	if (checkIndex(pos)) {
-		//TODO: Rzucanie wyjątku o niepoprawne odwołanie elementu
-		std::cout << "Err: Invalid position to get value!\n";
-	}
+double & vector::at(size_t pos) {
+	//Rzucanie wyjątku
+	if (checkIndex(pos)) throw std::out_of_range("Err: Invalid position to get value!");
 
-	//Obliczenie dolnej granicy
-	int posDown = static_cast<int>(std::floor(pos));
-
-	//Zwracanie wartości dla pozycji całkowitej
-	if (pos == posDown) return _data[posDown];
-
-	//Obliczenie górnej granicy
-	int posUp = static_cast<int>(std::ceil(pos));
-
-	//Interpolacja
-	return _data[posDown] + (_data[posUp] - _data[posDown]) * ((pos - posDown)/(posUp - posDown));
+	//Zwracanie referencji do elementu
+	return _data[pos];
 }
 
 void vector::clear() {
@@ -121,16 +108,9 @@ void vector::clear() {
 	_size = 0;
 }
 
-bool vector::empty() {
-	//Wektor jest pusty gdy ma zero elementów
-	return _size == 0;
-}
-
 void vector::insert(size_t pos, double value) {
-	if (checkIndex(pos)) {
-		//TODO: Rzucanie wyjątku
-		std::cout << "Err: Invalid position to insert!\n";
-	}
+	//Rzucanie wyjątku
+	if (checkIndex(pos)) throw std::out_of_range("Err: Invalid position to insert!");
 
 	//Copy-On-Write
 	checkInstance();
@@ -139,31 +119,42 @@ void vector::insert(size_t pos, double value) {
 	_data[pos] = value;
 }
 
+double vector::interpolate(double pos) {
+	//Rzucanie wyjątku
+	if (checkIndex(pos)) throw std::out_of_range("Err: Invalid position to get value!");
+
+	//Obliczenie dolnej granicy
+	int posDown = static_cast<int>(std::floor(pos));
+
+	//Zwracanie wartości dla pozycji całkowitej
+	if (pos == posDown) return at(posDown);
+
+	//Obliczenie górnej granicy
+	int posUp = static_cast<int>(std::ceil(pos));
+
+	//Interpolacja
+	return _data[posDown] + (_data[posUp] - _data[posDown]) * ((pos - posDown) / (posUp - posDown));
+}
+
 double vector::max() {
-	if (empty()) {
-		//TODO: Rzucanie wyjątku
-		std::cout << "Err: Can't find max in empty vector!\n";
-	}
+	//Rzucanie wyjątku
+	if (empty()) throw std::length_error("Err: Can't find max in empty vector!");
 
 	//Zwracanie wartości największej
 	return *std::max_element(begin(), end());
 }
 
 double vector::min() {
-	if (empty()) {
-		//TODO: Rzucanie wyjątku
-		std::cout << "Err: Can't find min in empty vector!\n";
-	}
+	//Rzucanie wyjątku
+	if (empty()) throw std::length_error("Err: Can't find min in empty vector!");
 
 	//Zwracanie wartości najmniejszej
 	return *std::min_element(begin(), end());
 }
 
 double vector::pop_back() {
-	if (empty()) {
-		//TODO: Rzucanie wyjątku
-		std::cout << "Err: Cant pop from empty vector!\n";
-	}
+	//Rzucanie wyjątku
+	if (empty()) throw std::length_error("Err: Cant pop from empty vector!");
 
 	//Wyrzucanie ostatniej wartości z tablicy
 	return _data[_size--];
@@ -175,20 +166,32 @@ void vector::push_back(double value) {
 
 	//Gdy w tablicy nie ma miejsca...
 	if (_size + 1 > _capacity) {
-		//Deklaracja nowej dwa razy większej
+		//Zarezerwowanie miejsca dwa razy większego
 		_capacity *= 2;
-		double *newData = new double[_capacity];
-
-		//Kopia danych
-		std::copy_n(_data, _size, newData);
-
-		//Usunięcie starej tablicy i przepięcie na nową
-		delete[] _data;
-		_data = newData;
+		reserve(_capacity);
 	}
 
 	//Wpisanie elementu
 	_data[_size++] = value;
+}
+
+void vector::reserve(size_t newSize) {
+	//Copy-On-Write
+	checkInstance();
+
+	//Przerwanie w przypadku rezerwacji mniejszej ilości miejsca
+	if (_size >= newSize) return;
+
+	//Ustalenie nowej pojemności
+	_capacity = newSize;
+
+	//Kopia danych
+	double *newData = new double[_capacity];
+	std::copy_n(_data, _size, newData);
+
+	//Usunięcie starej tablicy i przepięcie na nową
+	delete[] _data;
+	_data = newData;
 }
 
 void vector::reverse() {
