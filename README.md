@@ -3,11 +3,11 @@ Własna implementacja std::vector z interpolacją danych i paradygmatem copy-on-
 ## Metody
 Z założenia większośc metod działa identycznie jak w STL'owej implementacji vector'a.
 ## Metody "dodatkowe"
-double interpolate(double pos) - pozwala na interpolację danych, dla parametru całkowitego działa jak metoda at()  
-double max(); - zwraca wartość maksymalną wrzuconą do wektora  
-double min(); - zwraca wartość minimalną wrzuconą do wektora  
-void reverse(); - odwraca dane w wektorze  
-void sort(bool reverse); - sortuje dane w wektorze w kolejności rosnącej (reverse odwraca kolejnosć)  
+`double interpolate(double pos)` - pozwala na interpolację danych, dla parametru całkowitego działa jak metoda at()  
+`double max();` - zwraca wartość maksymalną wrzuconą do wektora  
+`double min();` - zwraca wartość minimalną wrzuconą do wektora  
+`void reverse();` - odwraca dane w wektorze  
+`void sort(bool reverse);` - sortuje dane w wektorze w kolejności rosnącej (reverse odwraca kolejnosć)  
 ## Interpolacja
 Dzięki mechanizmowi interpolacji danych, można odczytywać dane z pomiędzy komórek:
 ```
