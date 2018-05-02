@@ -12,9 +12,9 @@ Z założenia większośc metod działa identycznie jak w STL'owej implementacji
 ## Interpolacja
 Dzięki mechanizmowi interpolacji danych, można odczytywać dane z pomiędzy komórek:
 ```
-vector v;
+vector v(2);
 v.push_back(0);     //v[0] = 0
 v.push_back(10);    //v[1] = 10
-std::cout << v.interpolate(0.5); //Zwraca 5
+std::cout << v.interpolate(0); //Zwraca 0
 std::cout << v.interpolate(0.65); //Zwraca 6.5
 ```
