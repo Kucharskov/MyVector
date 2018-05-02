@@ -46,6 +46,7 @@ public:
 	//Metody
 	double & at(size_t);
 	void clear();
+	void erase(size_t);
 	void insert(size_t, double);
 	double pop_back();
 	void push_back(double);

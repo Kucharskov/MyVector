@@ -108,6 +108,21 @@ void vector::clear() {
 	_size = 0;
 }
 
+void vector::erase(size_t pos) {
+	//Rzucanie wyjątku
+	if (checkIndex(pos)) throw std::out_of_range("Err: Invalid position to erase!");
+
+	//Copy-On-Write
+	checkInstance();
+
+	//Przesunięcie danych
+	for (size_t i = pos; i < _size; i++)
+		_data[i] = _data[i + 1];
+
+	//Zmniejszenie rozmiaru
+	_size--;
+}
+
 void vector::insert(size_t pos, double value) {
 	//Rzucanie wyjątku
 	if (checkIndex(pos)) throw std::out_of_range("Err: Invalid position to insert!");
