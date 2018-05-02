@@ -128,8 +128,7 @@ void vector::erase(size_t pos) {
 	checkInstance();
 
 	//Przesunięcie danych
-	for (size_t i = pos; i < _size; i++)
-		_data[i] = _data[i + 1];
+	std::copy_n(_data + pos, _size - pos, _data + pos - 1);
 
 	//Zmniejszenie rozmiaru
 	_size--;
@@ -153,8 +152,7 @@ void vector::insert(size_t pos, double value) {
 	_size++;
 
 	//Przesunięcie danych
-	for (size_t i = _size; i > pos; i--)
-		_data[i] = _data[i - 1];
+	std::copy_n(_data + pos, _size - pos, _data + pos + 1);
 
 	//Wstawienie wartości
 	_data[pos] = value;
