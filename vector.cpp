@@ -36,7 +36,7 @@ vector::vector(size_t c) :
 	reserve(_capacity);
 }
 
-vector::vector(vector &copy) {
+vector::vector(const vector &copy) {
 	//Kopia płytka (COW)
 	_capacity = copy._capacity;
 	_size = copy._size;
@@ -115,7 +115,21 @@ void vector::insert(size_t pos, double value) {
 	//Copy-On-Write
 	checkInstance();
 
-	//Podmiana wartości
+	//Gdy w tablicy nie ma miejsca...
+	if (_size + 1 > _capacity) {
+		//Zarezerwowanie miejsca dwa razy większego
+		_capacity *= 2;
+		reserve(_capacity);
+	}
+
+	//Zwiększenie rozmiaru
+	_size++;
+
+	//Przesunięcie danych
+	for (size_t i = _size; i > pos; i--)
+		_data[i] = _data[i - 1];
+
+	//Wstawienie wartości
 	_data[pos] = value;
 }
 

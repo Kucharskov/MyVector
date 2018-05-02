@@ -1,11 +1,11 @@
 #pragma once
-#include <iostream>
 #include <algorithm>
 #include <functional>
+#include <stdexcept>
 
 // Implementacja klasy std::vector
 // Autor: Michał Kucharski (M. Kucharskov)
-// Wersja: 2.0 (z dnia 1.05.2018)
+// Wersja: 2.1 (z dnia 2.05.2018)
 // Wektor posiada inerpolację danych (odczyt wartości pośrednich)
 // oraz paradygmat Copy-On-Write optymalizujący zużycie pamięci
 
@@ -16,7 +16,7 @@ private:
 	size_t _size = 0;
 
 	//Copy-On-Write
-	size_t * _instances = 0;
+	size_t * _instances;
 	void checkInstance();
 
 	//Funkcje prywatne
@@ -27,7 +27,7 @@ public:
 	vector(size_t = 1);
 
 	//Konstruktor kopiujący
-	vector(vector &);
+	vector(const vector &);
 
 	//Destruktor
 	~vector();
