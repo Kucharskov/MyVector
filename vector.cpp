@@ -7,8 +7,10 @@ vector::double_proxy::double_proxy(vector &vec, const size_t pos) :
 vector::double_proxy & vector::double_proxy::operator=(const double val) {
 	//Sprawdzenie instancji (COW)
 	_v.checkInstance();
+
 	//Podmiana wartości
 	_v._data[_pos] = val;
+
 	//Zwrócenie proxy z wartością
 	return *this;
 }
@@ -148,11 +150,11 @@ void vector::insert(size_t pos, double value) {
 		reserve(_capacity);
 	}
 
-	//Zwiększenie rozmiaru
-	_size++;
-
 	//Przesunięcie danych
 	std::copy_n(_data + pos, _size - pos, _data + pos + 1);
+
+	//Zwiększenie rozmiaru
+	_size++;
 
 	//Wstawienie wartości
 	_data[pos] = value;
