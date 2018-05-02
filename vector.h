@@ -5,7 +5,7 @@
 
 // Implementacja klasy std::vector
 // Autor: Michał Kucharski (M. Kucharskov)
-// Wersja: 2.1 (z dnia 2.05.2018)
+// Wersja: 3.0 (z dnia 2.05.2018)
 // Wektor posiada inerpolację danych (odczyt wartości pośrednich)
 // oraz paradygmat Copy-On-Write optymalizujący zużycie pamięci
 
@@ -22,6 +22,21 @@ private:
 	//Funkcje prywatne
 	bool checkIndex(double);
 
+	//Klasa pośrednicząca w dostepie do danych (COW)
+	class double_proxy {
+	private:
+		vector& _v;
+		size_t _pos;
+
+	public:
+		//Konstruktor
+		double_proxy(vector&, const size_t);
+
+		//Operatory 
+		double_proxy& operator=(const double);
+		operator double() const { return _v._data[_pos]; }
+	};
+
 public:
 	//Konstrutkor
 	vector(size_t = 1);
@@ -35,16 +50,16 @@ public:
 	//Operatory
 	vector &operator=(const vector &);
 	bool operator==(const vector &);
-	double & operator[](size_t);
+	double_proxy operator[](size_t);
 
 	//Metody const
-	size_t size() const { return _size; };
-	size_t capacity() const { return _capacity; };
-	size_t instances() const { return *_instances; };
-	bool empty() const { return _size == 0; };
+	size_t size() const { return _size; }
+	size_t capacity() const { return _capacity; }
+	size_t instances() const { return *_instances; }
+	bool empty() const { return _size == 0; }
 
 	//Metody
-	double & at(size_t);
+	double_proxy at(size_t);
 	void clear();
 	void erase(size_t);
 	void insert(size_t, double);

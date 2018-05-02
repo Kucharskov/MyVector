@@ -1,5 +1,18 @@
 #include "vector.h"
 
+vector::double_proxy::double_proxy(vector &vec, const size_t pos) :
+	_v(vec), _pos(pos) {
+}
+
+vector::double_proxy & vector::double_proxy::operator=(const double val) {
+	//Sprawdzenie instancji (COW)
+	_v.checkInstance();
+	//Podmiana wartości
+	_v._data[_pos] = val;
+	//Zwrócenie proxy z wartością
+	return *this;
+}
+
 void vector::checkInstance() {
 	//Przy większej ilości instancji (COW)
 	if (*_instances > 1) {
@@ -24,8 +37,7 @@ bool vector::checkIndex(double pos) {
 }
 
 vector::vector(size_t c) :
-	_capacity(c),
-	_size(0) {
+	_capacity(c), _size(0) {
 	//Rzucanie wyjątku
 	if (c == 0)	throw std::length_error("Err: Vector size can't be 0!");
 	
@@ -90,17 +102,17 @@ bool vector::operator==(const vector &other) {
 	return true;
 }
 
-double & vector::operator[](size_t pos) {
+vector::double_proxy vector::operator[](size_t pos) {
 	//Zwracanie działania metody at()
 	return at(pos);
 }
 
-double & vector::at(size_t pos) {
+vector::double_proxy vector::at(size_t pos) {
 	//Rzucanie wyjątku
 	if (checkIndex(pos)) throw std::out_of_range("Err: Invalid position to get value!");
 
 	//Zwracanie referencji do elementu
-	return _data[pos];
+	return double_proxy(*this, pos);
 }
 
 void vector::clear() {
