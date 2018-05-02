@@ -158,6 +158,14 @@ void vector::insert(size_t pos, double value) {
 	_data[pos] = value;
 }
 
+double vector::avg() {
+	//Rzucanie wyjątku
+	if (empty()) throw std::length_error("Err: Can't find avg in empty vector!");
+
+	//Zwracanie średniej
+	return std::accumulate(begin(), end(), 0.0) / _size;
+}
+
 double vector::interpolate(double pos) {
 	//Rzucanie wyjątku
 	if (checkIndex(pos)) throw std::out_of_range("Err: Invalid position to get value!");

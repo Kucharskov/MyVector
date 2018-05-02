@@ -3,6 +3,7 @@ Własna implementacja std::vector z interpolacją danych i paradygmatem copy-on-
 ## Metody
 Z założenia większośc metod działa identycznie jak w STL'owej implementacji vector'a.
 ## Metody "dodatkowe"
+`double avg();` - zwraca wartość średnią z wektora  
 `double interpolate(double pos)` - pozwala na interpolację danych, dla parametru całkowitego działa jak metoda at()  
 `double max();` - zwraca wartość maksymalną wrzuconą do wektora  
 `double min();` - zwraca wartość minimalną wrzuconą do wektora  

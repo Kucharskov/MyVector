@@ -1,11 +1,12 @@
 #pragma once
+#include <numeric>
 #include <algorithm>
 #include <functional>
 #include <stdexcept>
 
 // Implementacja klasy std::vector
 // Autor: Michał Kucharski (M. Kucharskov)
-// Wersja: 3.0 (z dnia 2.05.2018)
+// Wersja: 3.1 (z dnia 2.05.2018)
 // Wektor posiada inerpolację danych (odczyt wartości pośrednich)
 // oraz paradygmat Copy-On-Write optymalizujący zużycie pamięci
 
@@ -70,6 +71,7 @@ public:
 	void sort(bool = false);
 
 	//Metody stricte matematyczne
+	double avg();
 	double interpolate(double);
 	double max();
 	double min();
