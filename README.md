@@ -4,7 +4,7 @@ Własna implementacja std::vector z interpolacją danych i paradygmatem copy-on-
 Z założenia większość metod działa identycznie jak w STL'owej implementacji vector'a.
 ## Metody "dodatkowe"
 `double avg();` - zwraca wartość średnią z wektora  
-`double interpolate(double pos)` - pozwala na interpolację danych, dla parametru całkowitego działa jak metoda at()  
+`double interpolate(double pos);` - pozwala na interpolację danych, dla parametru całkowitego działa jak metoda at()  
 `double max();` - zwraca wartość maksymalną wrzuconą do wektora  
 `double min();` - zwraca wartość minimalną wrzuconą do wektora  
 `void reverse();` - odwraca dane w wektorze  
@@ -24,7 +24,7 @@ MyVector project is my own implementation of std::vector with data interpolation
 For an instance, most of the methods are STL-like implementations.
 ## Additional methods
 `double avg();` - returns avarage value from a vector  
-`double interpolate(double pos)` - interpolates given double value, in case of int type value, it will behave like at() method  
+`double interpolate(double pos);` - interpolates given double value, in case of int type value, it will behave like at() method  
 `double max();` - returns maximal value found in a vector  
 `double min();` - returns minimal value found in a vector  
 `void reverse();` - reverses an order of elements stored in a vector  
