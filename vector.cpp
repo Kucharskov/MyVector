@@ -56,8 +56,8 @@ vector::vector(const vector &copy) {
 	_size = copy._size;
 	_data = copy._data;
 	_instances = copy._instances;
-	_iMin = copy._iMin;
-	_iMax = copy._iMax;
+	_min = copy._min;
+	_max = copy._max;
 
 	//Zwiększenie licznika instancji (COW)
 	(*_instances)++;
@@ -80,8 +80,8 @@ vector & vector::operator=(const vector &copy) {
 	_size = copy._size;
 	_data = copy._data;
 	_instances = copy._instances;
-	_iMin = copy._iMin;
-	_iMax = copy._iMax;
+	_min = copy._min;
+	_max = copy._max;
 
 	//Zwiększenie licznika instancji (COW)
 	(*_instances)++;
@@ -141,14 +141,14 @@ void vector::erase(size_t pos) {
 
 	//Poszukiwanie min / max
 	//Gdy rozmiar wynosi 1 to min = max = element 0
-	if (_size == 1) _iMin = _iMax = 0;
+	if (_size == 1) _min.second = _max.second = 0;
 	else {
 		//Gdy usunięto element przed min / max to przesuń je o 1
-		if (pos < _iMin) _iMin--;
-		if (pos < _iMax) _iMax--;
-		//Jeżeli wyrzucono ekstremum, znajdź nowe
-		if (pos == _iMin) _iMin = std::distance(begin(), std::min_element(begin(), end()));
-		if (pos == _iMax) _iMax = std::distance(begin(), std::max_element(begin(), end()));
+		if (pos < _min.second) _min.second--;
+		if (pos < _max.second) _max.second--;
+		//Jeżeli wyrzucono ekstremum ustaw flagę
+		if (pos == _min.second) _min.first = true;// std::distance(begin(), std::min_element(begin(), end()));
+		if (pos == _max.second) _max.first = true;// std::distance(begin(), std::max_element(begin(), end()));
 	}
 }
 
@@ -178,10 +178,10 @@ void vector::insert(size_t pos, double value) {
 	//Poszukiwanie min / max
 	//Gdy wrzucono nowe ekstremum, ustaw je
 	//W przeciwnym razie przesuń, jeżeli wstawiono coś przed ekstremum
-	if (pos <= _iMin) _iMin++;
-	if (value < _data[_iMin]) _iMin = pos;
-	if (pos <= _iMax) _iMax++;
-	if (value > _data[_iMax]) _iMax = pos;
+	if (pos <= _min.second) _min.second++;
+	if (value < _data[_min.second]) _min.second = pos;
+	if (pos <= _max.second) _max.second++;
+	if (value > _data[_max.second]) _max.second = pos;
 }
 
 double vector::avg() {
@@ -213,16 +213,32 @@ double vector::max() {
 	//Rzucanie wyjątku
 	if (empty()) throw std::length_error("Err: Can't find max in empty vector!");
 
+	//Jeżeli flaga naruszenia maksimum jest ustawiona
+	if (_max.first == true) {
+		//Znajdź faktyczne maksimum
+		_max.second = std::distance(begin(), std::max_element(begin(), end()));
+		//Zgaś flagę
+		_max.first == false;
+	}
+	
 	//Zwracanie wartości największej
-	return _data[_iMax];
+	return _data[_max.second];
 }
 
 double vector::min() {
 	//Rzucanie wyjątku
 	if (empty()) throw std::length_error("Err: Can't find min in empty vector!");
 
+	//Jeżeli flaga naruszenia minimum jest ustawiona
+	if (_min.first == true) {
+		//Znajdź faktyczne minimum
+		_min.second = std::distance(begin(), std::min_element(begin(), end()));
+		//Zgaś flagę
+		_min.first == false;
+	}
+
 	//Zwracanie wartości najmniejszej
-	return _data[_iMin];
+	return _data[_min.second];
 }
 
 double vector::pop_back() {
@@ -234,11 +250,11 @@ double vector::pop_back() {
 
 	//Poszukiwanie min / max
 	//Gdy rozmiar wynosi 1 to min = max = element 0
-	if (_size == 1) _iMin = _iMax = 0;
+	if (_size == 1) _min.second = _max.second = 0;
 	else {
-		//Jeżeli wyrzucono ekstremum, znajdź nowe
-		if (_size == _iMin) _iMin = std::distance(begin(), std::min_element(begin(), end()));
-		if (_size == _iMax) _iMax = std::distance(begin(), std::max_element(begin(), end()));
+		//Jeżeli wyrzucono ekstremum  ustaw flagę
+		if (_size == _min.second) _min.first = true;// std::distance(begin(), std::min_element(begin(), end()));
+		if (_size == _max.second) _max.first = true;// = std::distance(begin(), std::max_element(begin(), end()));
 	}
 
 	//Zwrócenie usuniętego elementu
@@ -261,11 +277,11 @@ void vector::push_back(double value) {
 
 	//Poszukiwanie min / max
 	//Gdy rozmiar wynosi 1 to min = max = element 0
-	if (_size == 1) _iMin = _iMax = 0;
+	if (_size == 1) _min.second = _max.second = 0;
 	else {
 		//Gdy wrzucany jest kolejny element sprawdź czy jest ekstremum
-		if (value < _data[_iMin]) _iMin = _size - 1;
-		if (value > _data[_iMax]) _iMax = _size - 1;
+		if (value < _data[_min.second]) _min.second = _size - 1;
+		if (value > _data[_max.second]) _max.second = _size - 1;
 	}
 }
 
@@ -298,8 +314,8 @@ void vector::reverse() {
 		std::reverse(begin(), end());
 
 		//Odbicie min / max
-		_iMin = _size - 1 - _iMin;
-		_iMax = _size - 1 - _iMax;
+		_min.second = _size - 1 - _min.second;
+		_max.second = _size - 1 - _max.second;
 	}
 }
 
@@ -315,11 +331,11 @@ void vector::sort(bool reverse) {
 
 		//Poszukiwanie min / max
 		//Gdy rozmiar wynosi 1 to min = max = element 0
-		if (_size == 1) _iMin = _iMax = 0;
+		if (_size == 1) _min.second = _max.second = 0;
 		//Posortowane elementy, więc min jest na miejscu 0, a max jest ostatnie
-		_iMin = 0;
-		_iMax = _size - 1;
+		_min.second = 0;
+		_max.second = _size - 1;
 		//Przy sortowaniu odwrotnym, min i max są zamienione
-		if (reverse) std::swap(_iMin, _iMax);
+		if (reverse) std::swap(_min.second, _max.second);
 	}
 }

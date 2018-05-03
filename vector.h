@@ -16,7 +16,7 @@ private:
 	double * _data = nullptr;
 	size_t _capacity = 0;
 	size_t _size = 0;
-	size_t _iMin, _iMax;
+	std::pair<bool, size_t> _min, _max;
 
 	//Copy-On-Write
 	size_t * _instances;
