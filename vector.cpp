@@ -56,6 +56,8 @@ vector::vector(const vector &copy) {
 	_size = copy._size;
 	_data = copy._data;
 	_instances = copy._instances;
+	_min = copy._min;
+	_max = copy._max;
 
 	//Zwiększenie licznika instancji (COW)
 	(*_instances)++;
@@ -78,6 +80,8 @@ vector & vector::operator=(const vector &copy) {
 	_size = copy._size;
 	_data = copy._data;
 	_instances = copy._instances;
+	_min = copy._min;
+	_max = copy._max;
 
 	//Zwiększenie licznika instancji (COW)
 	(*_instances)++;
@@ -97,7 +101,7 @@ bool vector::operator==(const vector &other) {
 	if (_capacity != other._capacity) return false;
 	
 	//Sprawdzanie poszczególnych elementów
-	for (size_t i = 0; i < _size; i++)
+	for (size_t i(0); i < _size; i++)
 		if (_data[i] != other._data[i]) return false;
 	
 	//Ostatecznie równe
@@ -134,6 +138,18 @@ void vector::erase(size_t pos) {
 	
 	//Zmniejszenie rozmiaru
 	_size--;
+
+	//Poszukiwanie min / max
+	//Gdy rozmiar wynosi 1 to min = max = element 0
+	if (_size == 1) _min.second = _max.second = 0;
+	else {
+		//Gdy usunięto element przed min / max to przesuń je o 1
+		if (pos < _min.second) _min.second--;
+		if (pos < _max.second) _max.second--;
+		//Jeżeli wyrzucono ekstremum ustaw flagę
+		if (pos == _min.second) _min.first = true;// std::distance(begin(), std::min_element(begin(), end()));
+		if (pos == _max.second) _max.first = true;// std::distance(begin(), std::max_element(begin(), end()));
+	}
 }
 
 void vector::insert(size_t pos, double value) {
@@ -158,6 +174,14 @@ void vector::insert(size_t pos, double value) {
 
 	//Wstawienie wartości
 	_data[pos] = value;
+
+	//Poszukiwanie min / max
+	//Gdy wrzucono nowe ekstremum, ustaw je
+	//W przeciwnym razie przesuń, jeżeli wstawiono coś przed ekstremum
+	if (pos <= _min.second) _min.second++;
+	if (value < _data[_min.second]) _min.second = pos;
+	if (pos <= _max.second) _max.second++;
+	if (value > _data[_max.second]) _max.second = pos;
 }
 
 double vector::avg() {
@@ -189,24 +213,52 @@ double vector::max() {
 	//Rzucanie wyjątku
 	if (empty()) throw std::length_error("Err: Can't find max in empty vector!");
 
+	//Jeżeli flaga naruszenia maksimum jest ustawiona
+	if (_max.first == true) {
+		//Znajdź faktyczne maksimum
+		_max.second = std::distance(begin(), std::max_element(begin(), end()));
+		//Zgaś flagę
+		_max.first == false;
+	}
+	
 	//Zwracanie wartości największej
-	return *std::max_element(begin(), end());
+	return _data[_max.second];
 }
 
 double vector::min() {
 	//Rzucanie wyjątku
 	if (empty()) throw std::length_error("Err: Can't find min in empty vector!");
 
+	//Jeżeli flaga naruszenia minimum jest ustawiona
+	if (_min.first == true) {
+		//Znajdź faktyczne minimum
+		_min.second = std::distance(begin(), std::min_element(begin(), end()));
+		//Zgaś flagę
+		_min.first == false;
+	}
+
 	//Zwracanie wartości najmniejszej
-	return *std::min_element(begin(), end());
+	return _data[_min.second];
 }
 
 double vector::pop_back() {
 	//Rzucanie wyjątku
 	if (empty()) throw std::length_error("Err: Cant pop from empty vector!");
 
-	//Wyrzucanie ostatniej wartości z tablicy
-	return _data[_size--];
+	//Wyrzucenie ostatniego elementu poprzez przycięcie go rozmiarem
+	_size--;
+
+	//Poszukiwanie min / max
+	//Gdy rozmiar wynosi 1 to min = max = element 0
+	if (_size == 1) _min.second = _max.second = 0;
+	else {
+		//Jeżeli wyrzucono ekstremum  ustaw flagę
+		if (_size == _min.second) _min.first = true;
+		if (_size == _max.second) _max.first = true;
+	}
+
+	//Zwrócenie usuniętego elementu
+	return _data[_size + 1];
 }
 
 void vector::push_back(double value) {
@@ -222,6 +274,15 @@ void vector::push_back(double value) {
 
 	//Wpisanie elementu
 	_data[_size++] = value;
+
+	//Poszukiwanie min / max
+	//Gdy rozmiar wynosi 1 to min = max = element 0
+	if (_size == 1) _min.second = _max.second = 0;
+	else {
+		//Gdy wrzucany jest kolejny element sprawdź czy jest ekstremum
+		if (value < _data[_min.second]) _min.second = _size - 1;
+		if (value > _data[_max.second]) _max.second = _size - 1;
+	}
 }
 
 void vector::reserve(size_t newSize) {
@@ -251,6 +312,10 @@ void vector::reverse() {
 
 		//Odwróć zawartość tablicy
 		std::reverse(begin(), end());
+
+		//Odbicie min / max
+		_min.second = _size - 1 - _min.second;
+		_max.second = _size - 1 - _max.second;
 	}
 }
 
@@ -263,5 +328,14 @@ void vector::sort(bool reverse) {
 		//Sortowanie (optymalizowane przez kompilator)
 		if (reverse == false) std::sort(begin(), end());
 		else std::sort(begin(), end(), std::greater<>());
+
+		//Poszukiwanie min / max
+		//Gdy rozmiar wynosi 1 to min = max = element 0
+		if (_size == 1) _min.second = _max.second = 0;
+		//Posortowane elementy, więc min jest na miejscu 0, a max jest ostatnie
+		_min.second = 0;
+		_max.second = _size - 1;
+		//Przy sortowaniu odwrotnym, min i max są zamienione
+		if (reverse) std::swap(_min.second, _max.second);
 	}
 }

@@ -6,15 +6,21 @@
 
 // Implementacja klasy std::vector
 // Autor: Michał Kucharski (M. Kucharskov)
-// Wersja: 3.2 (z dnia 2.05.2018)
+// Wersja: 3.5 (z dnia 3.05.2018)
 // Wektor posiada inerpolację danych (odczyt wartości pośrednich)
-// oraz paradygmat Copy-On-Write optymalizujący zużycie pamięci
+// oraz paradygmat Copy-On-Write optymalizujący zużycie pamięci.
+// Funkcje min(), max() są złożoności czasowej O(1)
 
 class vector {
 private:
 	double * _data = nullptr;
 	size_t _capacity = 0;
 	size_t _size = 0;
+
+	//Przechowywanie indeksów ekstremów
+	//bool - flaga naruszenia danych
+	//size_t - indeks wartości ekstremum
+	std::pair<bool, size_t> _min, _max;
 
 	//Copy-On-Write
 	size_t * _instances;
