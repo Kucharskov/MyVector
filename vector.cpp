@@ -101,7 +101,7 @@ bool vector::operator==(const vector &other) {
 	if (_capacity != other._capacity) return false;
 	
 	//Sprawdzanie poszczególnych elementów
-	for (size_t i = 0; i < _size; i++)
+	for (size_t i(0); i < _size; i++)
 		if (_data[i] != other._data[i]) return false;
 	
 	//Ostatecznie równe
@@ -253,8 +253,8 @@ double vector::pop_back() {
 	if (_size == 1) _min.second = _max.second = 0;
 	else {
 		//Jeżeli wyrzucono ekstremum  ustaw flagę
-		if (_size == _min.second) _min.first = true;// std::distance(begin(), std::min_element(begin(), end()));
-		if (_size == _max.second) _max.first = true;// = std::distance(begin(), std::max_element(begin(), end()));
+		if (_size == _min.second) _min.first = true;
+		if (_size == _max.second) _max.first = true;
 	}
 
 	//Zwrócenie usuniętego elementu

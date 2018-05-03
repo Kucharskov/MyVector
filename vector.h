@@ -16,6 +16,10 @@ private:
 	double * _data = nullptr;
 	size_t _capacity = 0;
 	size_t _size = 0;
+
+	//Przechowywanie indeksów ekstremów
+	//bool - flaga naruszenia danych
+	//size_t - indeks wartości ekstremum
 	std::pair<bool, size_t> _min, _max;
 
 	//Copy-On-Write
