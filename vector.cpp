@@ -130,8 +130,8 @@ void vector::erase(size_t pos) {
 	checkInstance();
 
 	//Przesunięcie danych
-	std::copy_n(_data + pos, _size - pos, _data + pos - 1);
-
+	std::copy_n(_data + pos + 1, _size - 1, _data + pos);
+	
 	//Zmniejszenie rozmiaru
 	_size--;
 }
