@@ -8,7 +8,8 @@
 // Autor: Michał Kucharski (M. Kucharskov)
 // Wersja: 3.5 (z dnia 3.05.2018)
 // Wektor posiada inerpolację danych (odczyt wartości pośrednich)
-// oraz paradygmat Copy-On-Write optymalizujący zużycie pamięci
+// oraz paradygmat Copy-On-Write optymalizujący zużycie pamięci.
+// Funkcje min(), max() są złożoności czasowej O(1)
 
 class vector {
 private:
