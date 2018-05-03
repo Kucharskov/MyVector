@@ -50,6 +50,19 @@ vector::vector(size_t c) :
 	reserve(_capacity);
 }
 
+vector::vector(std::initializer_list<double> data) :
+	_capacity(data.size()) {
+
+	//Licznik instancji (COW)
+	_instances = new size_t(1);
+
+	//Zarezerwowanie miejsca w pamięci
+	reserve(_capacity);
+
+	//Wrzucenie danych z listy inicializującej
+	for (auto el : data) push_back(el);
+}
+
 vector::vector(const vector &copy) {
 	//Kopia płytka (COW)
 	_capacity = copy._capacity;
@@ -282,6 +295,32 @@ void vector::push_back(double value) {
 		//Gdy wrzucany jest kolejny element sprawdź czy jest ekstremum
 		if (value < _data[_min.second]) _min.second = _size - 1;
 		if (value > _data[_max.second]) _max.second = _size - 1;
+	}
+}
+
+void vector::push_back(std::initializer_list<double> data) {
+	//Copy-On-Write
+	checkInstance();
+
+	//Gdy w tablicy nie ma miejsca...
+	if (_size + data.size() > _capacity) {
+		//Zarezerwowanie wystarczającej ilości miejsca
+		_capacity = _size + data.size();
+		reserve(_capacity);
+	}
+
+	//Wrzucenie danych z listy inicializującej
+	for (auto el : data) {
+		_data[_size++] = el;
+
+		//Poszukiwanie min / max
+		//Gdy rozmiar wynosi 1 to min = max = element 0
+		if (_size == 1) _min.second = _max.second = 0;
+		else {
+			//Gdy wrzucany jest kolejny element sprawdź czy jest ekstremum
+			if (el < _data[_min.second]) _min.second = _size - 1;
+			if (el > _data[_max.second]) _max.second = _size - 1;
+		}
 	}
 }
 

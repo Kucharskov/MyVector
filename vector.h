@@ -6,7 +6,7 @@
 
 // Implementacja klasy std::vector
 // Autor: Michał Kucharski (M. Kucharskov)
-// Wersja: 3.5 (z dnia 3.05.2018)
+// Wersja: 4.0 (z dnia 3.05.2018)
 // Wektor posiada inerpolację danych (odczyt wartości pośrednich)
 // oraz paradygmat Copy-On-Write optymalizujący zużycie pamięci.
 // Funkcje min(), max() są złożoności czasowej O(1)
@@ -45,8 +45,11 @@ private:
 	};
 
 public:
-	//Konstrutkor
+	//Konstrutkor domyślny
 	vector(size_t = 1);
+
+	//Kontruktor inicializujący
+	vector(std::initializer_list<double>);
 
 	//Konstruktor kopiujący
 	vector(const vector &);
@@ -72,6 +75,7 @@ public:
 	void insert(size_t, double);
 	double pop_back();
 	void push_back(double);
+	void push_back(std::initializer_list<double>);
 	void reserve(size_t);
 	void reverse();
 	void sort(bool = false);
