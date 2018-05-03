@@ -6,7 +6,7 @@
 
 // Implementacja klasy std::vector
 // Autor: Michał Kucharski (M. Kucharskov)
-// Wersja: 3.2 (z dnia 2.05.2018)
+// Wersja: 3.5 (z dnia 3.05.2018)
 // Wektor posiada inerpolację danych (odczyt wartości pośrednich)
 // oraz paradygmat Copy-On-Write optymalizujący zużycie pamięci
 
@@ -15,6 +15,7 @@ private:
 	double * _data = nullptr;
 	size_t _capacity = 0;
 	size_t _size = 0;
+	size_t _iMin, _iMax;
 
 	//Copy-On-Write
 	size_t * _instances;

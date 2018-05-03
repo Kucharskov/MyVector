@@ -56,6 +56,8 @@ vector::vector(const vector &copy) {
 	_size = copy._size;
 	_data = copy._data;
 	_instances = copy._instances;
+	_iMin = copy._iMin;
+	_iMax = copy._iMax;
 
 	//Zwiększenie licznika instancji (COW)
 	(*_instances)++;
@@ -78,6 +80,8 @@ vector & vector::operator=(const vector &copy) {
 	_size = copy._size;
 	_data = copy._data;
 	_instances = copy._instances;
+	_iMin = copy._iMin;
+	_iMax = copy._iMax;
 
 	//Zwiększenie licznika instancji (COW)
 	(*_instances)++;
@@ -134,6 +138,18 @@ void vector::erase(size_t pos) {
 	
 	//Zmniejszenie rozmiaru
 	_size--;
+
+	//Poszukiwanie min / max
+	//Gdy rozmiar wynosi 1 to min = max = element 0
+	if (_size == 1) _iMin = _iMax = 0;
+	else {
+		//Gdy usunięto element przed min / max to przesuń je o 1
+		if (pos < _iMin) _iMin--;
+		if (pos < _iMax) _iMax--;
+		//Jeżeli wyrzucono ekstremum, znajdź nowe
+		if (pos == _iMin) _iMin = std::distance(begin(), std::min_element(begin(), end()));
+		if (pos == _iMax) _iMax = std::distance(begin(), std::max_element(begin(), end()));
+	}
 }
 
 void vector::insert(size_t pos, double value) {
@@ -158,6 +174,14 @@ void vector::insert(size_t pos, double value) {
 
 	//Wstawienie wartości
 	_data[pos] = value;
+
+	//Poszukiwanie min / max
+	//Gdy wrzucono nowe ekstremum, ustaw je
+	//W przeciwnym razie przesuń, jeżeli wstawiono coś przed ekstremum
+	if (value < _data[_iMin]) _iMin = pos;
+	else if (pos < _iMin) _iMin++;
+	if (value > _data[_iMax]) _iMax = pos;
+	else if (pos < _iMax) _iMax++;
 }
 
 double vector::avg() {
@@ -190,7 +214,7 @@ double vector::max() {
 	if (empty()) throw std::length_error("Err: Can't find max in empty vector!");
 
 	//Zwracanie wartości największej
-	return *std::max_element(begin(), end());
+	return _data[_iMax];
 }
 
 double vector::min() {
@@ -198,12 +222,21 @@ double vector::min() {
 	if (empty()) throw std::length_error("Err: Can't find min in empty vector!");
 
 	//Zwracanie wartości najmniejszej
-	return *std::min_element(begin(), end());
+	return _data[_iMin];
 }
 
 double vector::pop_back() {
 	//Rzucanie wyjątku
 	if (empty()) throw std::length_error("Err: Cant pop from empty vector!");
+
+	//Poszukiwanie min / max
+	//Gdy rozmiar wynosi 1 to min = max = element 0
+	if (_size == 1) _iMin = _iMax = 0;
+	else {
+		//Jeżeli wyrzucono ekstremum, znajdź nowe
+		if (_size - 1 == _iMin) _iMin = std::distance(begin(), std::min_element(begin(), end()-1));
+		if (_size - 1 == _iMax) _iMax = std::distance(begin(), std::max_element(begin(), end()-1));
+	}
 
 	//Wyrzucanie ostatniej wartości z tablicy
 	return _data[_size--];
@@ -222,6 +255,15 @@ void vector::push_back(double value) {
 
 	//Wpisanie elementu
 	_data[_size++] = value;
+
+	//Poszukiwanie min / max
+	//Gdy rozmiar wynosi 1 to min = max = element 0
+	if (_size == 1) _iMin = _iMax = 0;
+	else {
+		//Gdy wrzucany jest kolejny element sprawdź czy jest ekstremum
+		if (value < _data[_iMin]) _iMin = _size - 1;
+		if (value > _data[_iMax]) _iMax = _size - 1;
+	}
 }
 
 void vector::reserve(size_t newSize) {
@@ -251,6 +293,9 @@ void vector::reverse() {
 
 		//Odwróć zawartość tablicy
 		std::reverse(begin(), end());
+
+		//Zamień min / max
+		std::swap(_iMin, _iMax);
 	}
 }
 
@@ -263,5 +308,14 @@ void vector::sort(bool reverse) {
 		//Sortowanie (optymalizowane przez kompilator)
 		if (reverse == false) std::sort(begin(), end());
 		else std::sort(begin(), end(), std::greater<>());
+
+		//Poszukiwanie min / max
+		//Gdy rozmiar wynosi 1 to min = max = element 0
+		if (_size == 1) _iMin = _iMax = 0;
+		//Posortowane elementy, więc min jest na miejscu 0, a max jest ostatnie
+		_iMin = 0;
+		_iMax = _size - 1;
+		//Przy sortowaniu odwrotnym, min i max są zamienione
+		if (reverse) std::swap(_iMin, _iMax);
 	}
 }
