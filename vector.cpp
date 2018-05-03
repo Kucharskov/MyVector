@@ -178,10 +178,10 @@ void vector::insert(size_t pos, double value) {
 	//Poszukiwanie min / max
 	//Gdy wrzucono nowe ekstremum, ustaw je
 	//W przeciwnym razie przesuń, jeżeli wstawiono coś przed ekstremum
+	if (pos <= _iMin) _iMin++;
 	if (value < _data[_iMin]) _iMin = pos;
-	else if (pos < _iMin) _iMin++;
+	if (pos <= _iMax) _iMax++;
 	if (value > _data[_iMax]) _iMax = pos;
-	else if (pos < _iMax) _iMax++;
 }
 
 double vector::avg() {
@@ -297,8 +297,9 @@ void vector::reverse() {
 		//Odwróć zawartość tablicy
 		std::reverse(begin(), end());
 
-		//Zamień min / max
-		std::swap(_iMin, _iMax);
+		//Odbicie min / max
+		_iMin = _size - 1 - _iMin;
+		_iMax = _size - 1 - _iMax;
 	}
 }
 
