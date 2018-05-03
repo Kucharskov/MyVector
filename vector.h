@@ -6,7 +6,7 @@
 
 // Implementacja klasy std::vector
 // Autor: Michał Kucharski (M. Kucharskov)
-// Wersja: 4.0 (z dnia 3.05.2018)
+// Wersja: 4.1 (z dnia 4.05.2018)
 // Wektor posiada inerpolację danych (odczyt wartości pośrednich)
 // oraz paradygmat Copy-On-Write optymalizujący zużycie pamięci.
 // Funkcje min(), max() są złożoności czasowej O(1)
@@ -41,6 +41,7 @@ private:
 
 		//Operatory 
 		double_proxy& operator=(const double);
+		double_proxy& operator=(const double_proxy&);
 		operator double() const { return _v._data[_pos]; }
 	};
 

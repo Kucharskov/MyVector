@@ -11,6 +11,31 @@ vector::double_proxy & vector::double_proxy::operator=(const double val) {
 	//Podmiana wartości
 	_v._data[_pos] = val;
 
+	//Poszukiwanie min / max
+	//Gdy wpisana wartość jest nowym ekstremum przestaw indeks
+	if (val < _v._data[_v._min.second]) _v._min.second = _pos;
+	if (val > _v._data[_v._max.second]) _v._max.second = _pos;
+
+	//Zwrócenie proxy z wartością
+	return *this;
+}
+
+vector::double_proxy & vector::double_proxy::operator=(const double_proxy &other){
+	//Sprawdzenie instancji (COW)
+	_v.checkInstance();
+
+	//Podmiana wartości
+	double val = other._v._data[other._pos];
+	_v._data[_pos] = val;
+
+	//Poszukiwanie min / max
+	//Gdy pod wrzucanym indeksem było ekstremum ustaw flagę naruszenia
+	//Inaczej sprawdź czy wpisana wartość jest nowym ekstremum
+	if (_pos == _v._min.second) _v._min.first = true;
+	else if (val < _v._data[_v._min.second]) _v._min.second = _pos;
+	if (_pos == _v._max.second) _v._max.first = true;
+	else if (val > _v._data[_v._max.second]) _v._max.second = _pos;
+
 	//Zwrócenie proxy z wartością
 	return *this;
 }
