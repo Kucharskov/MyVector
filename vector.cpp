@@ -39,10 +39,11 @@ bool vector::checkIndex(double pos) {
 }
 
 vector::vector(size_t c) :
-	_capacity(c), _size(0) {
+	_capacity(c), _size(0),
+	_minCorruption(false), _maxCorruption(false) {
 	//Rzucanie wyjątku
 	if (c == 0)	throw std::length_error("Err: Vector size can't be 0!");
-	
+
 	//Licznik instancji (COW)
 	_instances = new size_t(1);
 
@@ -58,6 +59,8 @@ vector::vector(const vector &copy) {
 	_instances = copy._instances;
 	_iMin = copy._iMin;
 	_iMax = copy._iMax;
+	_minCorruption = copy._minCorruption;
+	_maxCorruption = copy._maxCorruption;
 
 	//Zwiększenie licznika instancji (COW)
 	(*_instances)++;
@@ -82,6 +85,8 @@ vector & vector::operator=(const vector &copy) {
 	_instances = copy._instances;
 	_iMin = copy._iMin;
 	_iMax = copy._iMax;
+	_minCorruption = copy._minCorruption;
+	_maxCorruption = copy._maxCorruption;
 
 	//Zwiększenie licznika instancji (COW)
 	(*_instances)++;
@@ -93,17 +98,17 @@ vector & vector::operator=(const vector &copy) {
 bool vector::operator==(const vector &other) {
 	//Muszą mieć tą samą ilość elementów
 	if (_size != other._size) return false;
-			
+
 	//Jeżeli są z tej samej instancji to są równe
 	if (_instances == other._instances) return true;
 
 	//Muszą mieć tą samą pojemność
 	if (_capacity != other._capacity) return false;
-	
+
 	//Sprawdzanie poszczególnych elementów
 	for (size_t i = 0; i < _size; i++)
 		if (_data[i] != other._data[i]) return false;
-	
+
 	//Ostatecznie równe
 	return true;
 }
@@ -135,7 +140,7 @@ void vector::erase(size_t pos) {
 
 	//Przesunięcie danych
 	std::copy_n(_data + pos + 1, _size - 1, _data + pos);
-	
+
 	//Zmniejszenie rozmiaru
 	_size--;
 
@@ -144,11 +149,11 @@ void vector::erase(size_t pos) {
 	if (_size == 1) _iMin = _iMax = 0;
 	else {
 		//Gdy usunięto element przed min / max to przesuń je o 1
-		if (pos < _iMin) _iMin--;
-		if (pos < _iMax) _iMax--;
 		//Jeżeli wyrzucono ekstremum, znajdź nowe
-		if (pos == _iMin) _iMin = std::distance(begin(), std::min_element(begin(), end()));
-		if (pos == _iMax) _iMax = std::distance(begin(), std::max_element(begin(), end()));
+		if (pos < _iMin) _iMin--;
+		else if (pos == _iMin) _minCorruption = true;
+		if (pos < _iMax) _iMax--;
+		else if (pos == _iMax) _maxCorruption = true;
 	}
 }
 
@@ -178,10 +183,10 @@ void vector::insert(size_t pos, double value) {
 	//Poszukiwanie min / max
 	//Gdy wrzucono nowe ekstremum, ustaw je
 	//W przeciwnym razie przesuń, jeżeli wstawiono coś przed ekstremum
-	if (pos <= _iMin) _iMin++;
 	if (value < _data[_iMin]) _iMin = pos;
-	if (pos <= _iMax) _iMax++;
+	else if (pos <= _iMin) _iMin++;
 	if (value > _data[_iMax]) _iMax = pos;
+	else if (pos <= _iMax) _iMax++;
 }
 
 double vector::avg() {
@@ -213,6 +218,12 @@ double vector::max() {
 	//Rzucanie wyjątku
 	if (empty()) throw std::length_error("Err: Can't find max in empty vector!");
 
+	if (_maxCorruption)
+	{
+		_iMax = std::max_element(begin(), end())-begin();
+		_maxCorruption = false;
+	}
+
 	//Zwracanie wartości największej
 	return _data[_iMax];
 }
@@ -220,6 +231,12 @@ double vector::max() {
 double vector::min() {
 	//Rzucanie wyjątku
 	if (empty()) throw std::length_error("Err: Can't find min in empty vector!");
+
+	if (_minCorruption)
+	{
+		_iMin = std::min_element(begin(), end()) - begin();
+		_minCorruption = false;
+	}
 
 	//Zwracanie wartości najmniejszej
 	return _data[_iMin];
@@ -237,8 +254,8 @@ double vector::pop_back() {
 	if (_size == 1) _iMin = _iMax = 0;
 	else {
 		//Jeżeli wyrzucono ekstremum, znajdź nowe
-		if (_size == _iMin) _iMin = std::distance(begin(), std::min_element(begin(), end()));
-		if (_size == _iMax) _iMax = std::distance(begin(), std::max_element(begin(), end()));
+		if (_size == _iMin) _minCorruption = true;
+		if (_size == _iMax) _maxCorruption = true;
 	}
 
 	//Zwrócenie usuniętego elementu
