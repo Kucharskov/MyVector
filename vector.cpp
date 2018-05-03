@@ -156,12 +156,12 @@ void vector::erase(size_t pos) {
 	//Gdy rozmiar wynosi 1 to min = max = element 0
 	if (_size == 1) _min.second = _max.second = 0;
 	else {
-		//Gdy usunięto element przed min / max to przesuń je o 1
+		//Gdy usunięto element przed min / max to przesuń indeksy
 		if (pos < _min.second) _min.second--;
 		if (pos < _max.second) _max.second--;
-		//Jeżeli wyrzucono ekstremum ustaw flagę
-		if (pos == _min.second) _min.first = true;// std::distance(begin(), std::min_element(begin(), end()));
-		if (pos == _max.second) _max.first = true;// std::distance(begin(), std::max_element(begin(), end()));
+		//Jeżeli wyrzucono ekstremum ustaw flagę naruszenia
+		if (pos == _min.second) _min.first = true;
+		if (pos == _max.second) _max.first = true;
 	}
 }
 
@@ -189,8 +189,8 @@ void vector::insert(size_t pos, double value) {
 	_data[pos] = value;
 
 	//Poszukiwanie min / max
-	//Gdy wrzucono nowe ekstremum, ustaw je
-	//W przeciwnym razie przesuń, jeżeli wstawiono coś przed ekstremum
+	//Przesuń indeks, jeżeli wstawiono coś przed ekstremum
+	//Gdy wrzucono nowe ekstremum, ustaw indeks
 	if (pos <= _min.second) _min.second++;
 	if (value < _data[_min.second]) _min.second = pos;
 	if (pos <= _max.second) _max.second++;
@@ -228,7 +228,7 @@ double vector::max() {
 
 	//Jeżeli flaga naruszenia maksimum jest ustawiona
 	if (_max.first == true) {
-		//Znajdź faktyczne maksimum
+		//Znajdź faktyczny indeks maksimum
 		_max.second = std::distance(begin(), std::max_element(begin(), end()));
 		//Zgaś flagę
 		_max.first == false;
@@ -244,7 +244,7 @@ double vector::min() {
 
 	//Jeżeli flaga naruszenia minimum jest ustawiona
 	if (_min.first == true) {
-		//Znajdź faktyczne minimum
+		//Znajdź faktyczny indeks minimum
 		_min.second = std::distance(begin(), std::min_element(begin(), end()));
 		//Zgaś flagę
 		_min.first == false;
@@ -265,7 +265,7 @@ double vector::pop_back() {
 	//Gdy rozmiar wynosi 1 to min = max = element 0
 	if (_size == 1) _min.second = _max.second = 0;
 	else {
-		//Jeżeli wyrzucono ekstremum  ustaw flagę
+		//Jeżeli wyrzucono ekstremum ustaw flagę naruszenia
 		if (_size == _min.second) _min.first = true;
 		if (_size == _max.second) _max.first = true;
 	}

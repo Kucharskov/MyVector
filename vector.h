@@ -18,7 +18,7 @@ private:
 	size_t _size = 0;
 
 	//Przechowywanie indeksów ekstremów
-	//bool - flaga naruszenia danych
+	//bool - flaga naruszenia ekstremum
 	//size_t - indeks wartości ekstremum
 	std::pair<bool, size_t> _min, _max;
 
