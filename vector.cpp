@@ -229,17 +229,20 @@ double vector::pop_back() {
 	//Rzucanie wyjątku
 	if (empty()) throw std::length_error("Err: Cant pop from empty vector!");
 
+	//Wyrzucenie ostatniego elementu poprzez przycięcie go rozmiarem
+	_size--;
+
 	//Poszukiwanie min / max
 	//Gdy rozmiar wynosi 1 to min = max = element 0
 	if (_size == 1) _iMin = _iMax = 0;
 	else {
 		//Jeżeli wyrzucono ekstremum, znajdź nowe
-		if (_size - 1 == _iMin) _iMin = std::distance(begin(), std::min_element(begin(), end()-1));
-		if (_size - 1 == _iMax) _iMax = std::distance(begin(), std::max_element(begin(), end()-1));
+		if (_size == _iMin) _iMin = std::distance(begin(), std::min_element(begin(), end()));
+		if (_size == _iMax) _iMax = std::distance(begin(), std::max_element(begin(), end()));
 	}
 
-	//Wyrzucanie ostatniej wartości z tablicy
-	return _data[_size--];
+	//Zwrócenie usuniętego elementu
+	return _data[_size + 1];
 }
 
 void vector::push_back(double value) {
