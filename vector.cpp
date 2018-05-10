@@ -185,7 +185,7 @@ void vector::erase(size_t pos) {
 	checkInstance();
 
 	//Przesunięcie danych
-	std::copy_n(_data + pos + 1, _size - 1, _data + pos);
+	if(pos < _size - 1) std::copy_n(_data + pos + 1, _size - 1, _data + pos);
 	
 	//Zmniejszenie rozmiaru
 	_size--;
