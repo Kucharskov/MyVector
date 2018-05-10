@@ -12,7 +12,7 @@ Jedynie dla uproszczenia, metody zamiast przyjmować iteratory przyjmują warto�
 `void sort(bool reverse);` - sortuje dane w wektorze w kolejności rosnącej (reverse odwraca kolejność)  
 ## Interpolacja
 Dzięki mechanizmowi interpolacji danych, można odczytywać dane z pomiędzy komórek:
-```
+```cpp
 vector v(2);
 v.push_back(0);     //v[0] = 0
 v.push_back(10);    //v[1] = 10
@@ -33,7 +33,7 @@ Only for simplify, methods instead taking iterators it take like size_t values w
 `void sort(bool reverse);` - sorts data stored in a vector in ascending order ("bool reverse" reverse order)  
 ## Interpolation
 Due to used interpolation mechanism this implementation allows to read data from between cells:
-```
+```cpp
 vector v(2);
 v.push_back(0);     //v[0] = 0
 v.push_back(10);    //v[1] = 10
