@@ -101,6 +101,19 @@ vector::vector(const vector &copy) {
 	(*_instances)++;
 }
 
+vector::vector(vector &&src) {
+	//Kopia płytka (COW)
+	_capacity = src._capacity;
+	_size = src._size;
+	_data = src._data;
+	_instances = src._instances;
+	_min = src._min;
+	_max = src._max;
+
+	//Zwiększenie licznika instancji (COW)
+	(*_instances)++;
+}
+
 vector::~vector() {
 	//Zmniejszanie licznika instancji (COW)
 	(*_instances)--;
@@ -256,7 +269,7 @@ double vector::max() {
 		//Znajdź faktyczny indeks maksimum
 		_max.second = std::distance(begin(), std::max_element(begin(), end()));
 		//Zgaś flagę
-		_max.first == false;
+		_max.first = false;
 	}
 	
 	//Zwracanie wartości największej
@@ -272,7 +285,7 @@ double vector::min() {
 		//Znajdź faktyczny indeks minimum
 		_min.second = std::distance(begin(), std::min_element(begin(), end()));
 		//Zgaś flagę
-		_min.first == false;
+		_min.first = false;
 	}
 
 	//Zwracanie wartości najmniejszej
