@@ -6,7 +6,7 @@
 
 // Implementacja klasy std::vector
 // Autor: Michał Kucharski (M. Kucharskov)
-// Wersja: 4.3 (z dnia 10.05.2018)
+// Wersja: 4.3.1 (z dnia 24.09.2018)
 // Wektor posiada inerpolację danych (odczyt wartości pośrednich)
 // oraz paradygmat Copy-On-Write optymalizujący zużycie pamięci.
 // Funkcje min(), max() są złożoności czasowej O(1)

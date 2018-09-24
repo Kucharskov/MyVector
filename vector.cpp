@@ -404,7 +404,7 @@ void vector::sort(bool reverse) {
 
 		//Sortowanie (optymalizowane przez kompilator)
 		if (reverse == false) std::sort(begin(), end());
-		else std::sort(begin(), end(), std::greater<>());
+		else std::sort(begin(), end(), std::greater<double>());
 
 		//Poszukiwanie min / max
 		//Gdy rozmiar wynosi 1 to min = max = element 0
